@@ -12,3 +12,5 @@ db.sqlite3
 
 # Các file hệ thống
 .DS_Store
+# Bỏ qua file ảnh 
+media/
