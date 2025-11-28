@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-key-du-phong')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,6 +39,9 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # Thêm thư viện
     'jazzmin',
+    # Viết API
+    'rest_framework',
+    'corsheaders',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,6 +54,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -61,6 +65,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'smartchef_BE.urls'
+# Cho phép mọi nguồn gọi API
+CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {
