@@ -1,7 +1,20 @@
 from django.db import models
 from django.utils.html import mark_safe
-# Create your models here.
 
+# --- Bảng Nguyên Liệu:
+class NguyenLieu(models.Model):
+    maNguyenLieu = models.AutoField(primary_key=True, verbose_name="Mã nguyên liệu")
+    tenNguyenLieu = models.CharField(max_length=200, unique=True, verbose_name="Tên nguyên liệu")
+    
+    def __str__(self):
+        return self.tenNguyenLieu
+
+    class Meta:
+        verbose_name = "Nguyên Liệu (Tags)"
+        verbose_name_plural = "Danh sách Nguyên Liệu"
+
+
+# --- Bảng Món Ăn:
 class MonAn(models.Model):
     LOAI_CHOICES = [
         ('sang', 'Bữa sáng'),
@@ -9,43 +22,33 @@ class MonAn(models.Model):
         ('toi', 'Bữa tối'),
     ]
 
-    # Django tự tạo id mặc định, nhưng nếu bạn muốn đặt tên là maMonAn:
     maMonAn = models.AutoField(primary_key=True, verbose_name="Mã món ăn")
-
-    # tenMonAn: VARCHAR(255)
     tenMonAn = models.CharField(max_length=255, verbose_name="Tên món ăn")
-
-    # moTa: TEXT
     moTa = models.TextField(verbose_name="Mô tả ngắn")
+    
+    chiTiet = models.TextField(verbose_name="Chi tiết công thức (Markdown)")
 
-    # chiTiet: TEXT (Markdown)
-    chiTiet = models.TextField(verbose_name="Chi tiết (Markdown)")
-
-    # thoiGian: INTEGER
     thoiGian = models.IntegerField(verbose_name="Thời gian nấu (phút)")
-
-    # calo: INTEGER
     calo = models.IntegerField(verbose_name="Lượng Calo (kcal)")
-
-    # hinhAnh: TEXT (URL ảnh)
+    
+    # Ảnh món ăn
     hinhAnh = models.ImageField(upload_to='monan/', verbose_name="Ảnh món ăn", blank=True, null=True)
-
-    # loai: VARCHAR(100)
+    
     loai = models.CharField(max_length=100, choices=LOAI_CHOICES, verbose_name="Loại bữa ăn")
 
-    # dsNguyenLieu: JSONB
-    # Cần Django 3.0+ và database là PostgreSQL để dùng tốt nhất
-    dsNguyenLieu = models.JSONField(verbose_name="Danh sách ID nguyên liệu", default=list)
+    # --- LIÊN KẾT TAGS ---
+    nguyen_lieu = models.ManyToManyField(
+        NguyenLieu, 
+        verbose_name="Chọn nguyên liệu",
+        related_name='cac_mon_an',
+        blank=True
+    )
 
-    # dsNguyenLieu_hash: VARCHAR(64)
-    dsNguyenLieu_hash = models.CharField(max_length=64, verbose_name="Hash nguyên liệu", blank=True, null=True)
-
-    # Hàm hỗ trợ hiển thị ảnh thu nhỏ trong Admin
+    # Hàm hiển thị ảnh nhỏ trong Admin
     def hinh_anh_preview(self):
         if self.hinhAnh:
             return mark_safe(f'<img src="{self.hinhAnh.url}" width="100" style="border-radius: 5px;" />')
         return "Chưa có ảnh"
-    
     hinh_anh_preview.short_description = "Xem trước"
 
     def __str__(self):
