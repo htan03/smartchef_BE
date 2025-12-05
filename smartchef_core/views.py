@@ -27,9 +27,6 @@ class MonAnByLoaiView(generics.ListAPIView):
 # API gợi ý món ăn theo nguyên liệu
 @api_view(['GET'])
 def goi_y_mon_an(request):
-    """
-    API: /api/mon-an/goi-y/?nguyen_lieu=trung,ca chua
-    """
     # 1. Lấy input từ URL
     query_string = request.GET.get('nguyen_lieu', '')
     if not query_string:
