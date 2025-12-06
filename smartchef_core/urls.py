@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import MonAnListView, MonAnByLoaiView, goi_y_mon_an, RegisterView, UserProfileView, ToggleFavoriteView, MyFavoritesView, TopMonAnView
+from .views import MonAnListView, MonAnByLoaiView, goi_y_mon_an, RegisterView, UserProfileView, ToggleFavoriteView, MyFavoritesView, TopMonAnView, ChangePasswordView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -31,4 +31,7 @@ urlpatterns = [
 
     # Xem list yêu thhíc: /api/yeu-thich/my-list/
     path('yeu-thich/my-list/', MyFavoritesView.as_view()),
+
+    # Đổi mật khẩu
+    path('change-password/', ChangePasswordView.as_view(), name='change_password'),
 ]

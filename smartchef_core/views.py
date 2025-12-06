@@ -13,9 +13,10 @@ from django.db.models import Count
 from .serializers import UserRegisterSerializer
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
-
+from .serializers import ChangePasswordSerializer
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+
 from .serializers import UserProfileSerializer
 
 # Create your views here.
@@ -35,6 +36,40 @@ class UserProfileView(APIView):
         
         serializer = UserProfileSerializer(user_hien_tai)
         return Response(serializer.data)
+
+
+# API đổi mật khẩu
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            user = request.user
+            old_pass = serializer.data['old_password']
+            new_pass = serializer.data['new_password']
+
+            # KIỂM TRA MẬT KHẨU CŨ
+            if not user.check_password(old_pass):
+                return Response(
+                    {"old_password": ["Mật khẩu cũ không chính xác."]}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Kiểm tra xem mật khẩu mới có trùng mật khẩu cũ không
+            if old_pass == new_pass:
+                return Response(
+                    {"new_password": ["Mật khẩu mới không được trùng với mật khẩu cũ."]}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            user.set_password(new_pass)
+            user.save()
+            
+            return Response({"message": "Đổi mật khẩu thành công!"}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Lấy tất cả món ăn
 class MonAnListView(generics.ListAPIView):

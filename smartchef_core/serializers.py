@@ -35,3 +35,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username']
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate_new_password(self, value):
+        if len(value) < 6:
+            raise serializers.ValidationError("Mật khẩu mới phải có ít nhất 6 ký tự.")
+        return value
