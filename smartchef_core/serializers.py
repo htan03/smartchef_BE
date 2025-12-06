@@ -1,13 +1,19 @@
 from rest_framework import serializers
-from .models import MonAn, NguyenLieu
+from .models import MonAn, NguyenLieu, YeuThich
 from django.contrib.auth.models import User
 
 class MonAnSerializer(serializers.ModelSerializer):
     nguyen_lieu = serializers.StringRelatedField(many=True)
-
+    is_favorite = serializers.SerializerMethodField()
     class Meta:
         model = MonAn
-        fields = ['maMonAn', 'tenMonAn', 'moTa', 'chiTiet', 'thoiGian', 'calo', 'hinhAnh', 'loai', 'nguyen_lieu']
+        fields = ['maMonAn', 'tenMonAn', 'moTa', 'chiTiet', 'thoiGian', 'calo', 'hinhAnh', 'loai', 'nguyen_lieu', 'is_favorite']
+    def get_is_favorite(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            # Kiểm tra xem user hiện tại có trong bảng YeuThich của món này không
+            return YeuThich.objects.filter(nguoi_dung=request.user, mon_an=obj).exists()
+        return False
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:

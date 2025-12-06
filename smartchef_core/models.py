@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.html import mark_safe
-
+from django.contrib.auth.models import User
 # --- Bảng Nguyên Liệu:
 class NguyenLieu(models.Model):
     maNguyenLieu = models.AutoField(primary_key=True, verbose_name="Mã nguyên liệu")
@@ -57,3 +57,20 @@ class MonAn(models.Model):
     class Meta:
         verbose_name = "Món Ăn"
         verbose_name_plural = "Danh sách Món Ăn"
+
+class YeuThich(models.Model):
+    # Ai thích?
+    nguoi_dung = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Người dùng")
+    # Thích món nào?
+    mon_an = models.ForeignKey(MonAn, on_delete=models.CASCADE, verbose_name="Món ăn")
+    # Thích lúc nào? (Để sắp xếp món mới thích lên đầu)
+    thoi_gian_tao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Một người chỉ được thích 1 món 1 lần
+        unique_together = ('nguoi_dung', 'mon_an')
+        verbose_name = "Lượt Yêu Thích"
+        verbose_name_plural = "Danh sách Yêu Thích"
+
+    def __str__(self):
+        return f"{self.nguoi_dung.username} thích {self.mon_an.tenMonAn}"

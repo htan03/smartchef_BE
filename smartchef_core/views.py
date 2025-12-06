@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from rest_framework import generics
 from .models import MonAn
+from .models import YeuThich
+from rest_framework import status
 from .serializers import MonAnSerializer
 from rest_framework.decorators import api_view # Custom API
 from rest_framework.response import Response
@@ -104,3 +106,36 @@ def goi_y_mon_an(request):
     serializer = MonAnSerializer(sorted_mon_an, many=True, context={'request': request})
     
     return Response(serializer.data)
+
+# API like/unlike
+class ToggleFavoriteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, mon_an_id):
+        user = request.user
+        try:
+            mon_an = MonAn.objects.get(pk=mon_an_id)
+        except MonAn.DoesNotExist:
+            return Response({"error": "Món ăn không tồn tại"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Kiểm tra: Có chưa? Nếu chưa thì tạo, có rồi thì lấy ra
+        obj, created = YeuThich.objects.get_or_create(nguoi_dung=user, mon_an=mon_an)
+
+        if not created:
+            # Nếu đã có (created = False) -> Nghĩa là User muốn BỎ thích -> Xóa
+            obj.delete()
+            return Response({"status": "unliked", "is_favorite": False})
+        else:
+            # Nếu vừa tạo mới (created = True) -> Nghĩa là User muốn THÍCH
+            return Response({"status": "liked", "is_favorite": True})
+        
+# 2. API Xem danh sách yêu thích
+class MyFavoritesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        # Lọc những món mà User này đã thích
+        mon_an_yeu_thich = MonAn.objects.filter(yeuthich__nguoi_dung=user)
+        serializer = MonAnSerializer(mon_an_yeu_thich, many=True, context={'request': request})
+        return Response(serializer.data)
