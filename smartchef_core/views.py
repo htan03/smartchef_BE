@@ -5,7 +5,32 @@ from .serializers import MonAnSerializer
 from rest_framework.decorators import api_view # Custom API
 from rest_framework.response import Response
 import unidecode
+
+from .serializers import UserRegisterSerializer
+from django.contrib.auth.models import User
+from rest_framework.permissions import AllowAny
+
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from .serializers import UserProfileSerializer
+
 # Create your views here.
+
+# Đăng ký tài khoản
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = UserRegisterSerializer
+
+# Lấy thông tin user
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated] # Bắt buộc phải có Token mới được xem
+
+    def get(self, request):
+        user_hien_tai = request.user 
+        
+        serializer = UserProfileSerializer(user_hien_tai)
+        return Response(serializer.data)
 
 # Lấy tất cả món ăn
 class MonAnListView(generics.ListAPIView):

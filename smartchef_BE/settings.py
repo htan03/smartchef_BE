@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv 
+from datetime import timedelta
 
 # Load nội dung file .env vào biến môi trường
 load_dotenv() 
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'jazzmin',
     # Viết API
     'rest_framework',
+    'rest_framework_simplejwt',  #jwt
     'corsheaders',
 
     'django.contrib.admin',
@@ -145,3 +147,33 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 # Thư mục vật lý trên máy tính để lưu file ảnh
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), # Token sống trong 60 phút
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Token làm mới sống 1 ngày
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY, # Dùng secret key để mã hóa
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'JWK_URL': None,
+    'LEEWAY': 0,
+
+    'AUTH_HEADER_TYPES': ('Bearer',), # Khi gửi lên header sẽ là: Authorization: Bearer <token>
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+}
