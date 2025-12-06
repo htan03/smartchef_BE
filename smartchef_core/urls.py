@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import MonAnListView, MonAnByLoaiView, goi_y_mon_an, RegisterView, UserProfileView, ToggleFavoriteView, MyFavoritesView
+from .views import MonAnListView, MonAnByLoaiView, goi_y_mon_an, RegisterView, UserProfileView, ToggleFavoriteView, MyFavoritesView, TopMonAnView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -19,6 +19,9 @@ urlpatterns = [
 
     # Gợi ý món ăn dựa vào nguyên liệu
     path('mon-an/goi-y/', goi_y_mon_an),
+
+    # Món ăn yêu thích 
+    path('mon-an/top-yeu-thich/', TopMonAnView.as_view()),
 
     # Lọc món ăn theo loại: sang/trua/chieu
     path('mon-an/<str:loai_mon>/', MonAnByLoaiView.as_view()),

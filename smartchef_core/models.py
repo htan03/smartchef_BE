@@ -62,7 +62,12 @@ class YeuThich(models.Model):
     # Ai thích?
     nguoi_dung = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Người dùng")
     # Thích món nào?
-    mon_an = models.ForeignKey(MonAn, on_delete=models.CASCADE, verbose_name="Món ăn")
+    mon_an = models.ForeignKey(
+        MonAn, 
+        on_delete=models.CASCADE, 
+        verbose_name="Món ăn",
+        related_name='yeuthich'
+    )
     # Thích lúc nào? (Để sắp xếp món mới thích lên đầu)
     thoi_gian_tao = models.DateTimeField(auto_now_add=True)
 

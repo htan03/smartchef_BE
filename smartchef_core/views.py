@@ -8,6 +8,8 @@ from rest_framework.decorators import api_view # Custom API
 from rest_framework.response import Response
 import unidecode
 
+from django.db.models import Count
+
 from .serializers import UserRegisterSerializer
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
@@ -129,7 +131,7 @@ class ToggleFavoriteView(APIView):
             # Nếu vừa tạo mới (created = True) -> Nghĩa là User muốn THÍCH
             return Response({"status": "liked", "is_favorite": True})
         
-# 2. API Xem danh sách yêu thích
+# API Xem danh sách yêu thích
 class MyFavoritesView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -138,4 +140,16 @@ class MyFavoritesView(APIView):
         # Lọc những món mà User này đã thích
         mon_an_yeu_thich = MonAn.objects.filter(yeuthich__nguoi_dung=user)
         serializer = MonAnSerializer(mon_an_yeu_thich, many=True, context={'request': request})
+        return Response(serializer.data)
+    
+# API món ăn nổi bật
+class TopMonAnView(APIView):
+    permission_classes = [AllowAny] 
+
+    def get(self, request):
+        top_mon_an = MonAn.objects.annotate(
+            so_luot_thich=Count('yeuthich') 
+        ).order_by('-so_luot_thich')[:5]
+        serializer = MonAnSerializer(top_mon_an, many=True, context={'request': request})
+        
         return Response(serializer.data)
